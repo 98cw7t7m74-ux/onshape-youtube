@@ -20,6 +20,24 @@ export function parseYouTube(input) {
   return null;
 }
 
+// Edpuzzle sends X-Frame-Options: SAMEORIGIN, so it can't be embedded; open it in a popup window instead.
+export function parseEdpuzzle(input) {
+  try {
+    const u = new URL(/^https?:\/\//.test(input.trim()) ? input.trim() : `https://${input.trim()}`);
+    const host = u.hostname.replace(/^www\./, '');
+    return host === 'edpuzzle.com' || host.endsWith('.edpuzzle.com') ? u.href : null;
+  } catch { return null; }
+}
+
+function openEdpuzzle(href) {
+  const w = window.open(href, 'edpuzzle', 'popup,width=1100,height=750');
+  $('player-wrap').hidden = true;
+  $('player').src = 'about:blank';
+  $('msg').textContent = w
+    ? 'Edpuzzle opened in a separate window (it can\u2019t be shown inside Onshape).'
+    : 'Your browser blocked the popup. Allow popups for this page and press Go again.';
+}
+
 function play({ video, list }) {
   const base = video ? `https://www.youtube-nocookie.com/embed/${video}` : 'https://www.youtube-nocookie.com/embed/videoseries';
   const params = new URLSearchParams({ autoplay: '1', rel: '0' });
@@ -33,7 +51,9 @@ $('form').addEventListener('submit', (e) => {
   e.preventDefault();
   const q = $('q').value.trim();
   if (!q) return;
-  const ref = parseYouTube(q);
-  if (ref) play(ref);
-  else $('msg').textContent = "That doesn't look like a YouTube link.";
+  const ed = parseEdpuzzle(q);
+  const ref = ed ? null : parseYouTube(q);
+  if (ed) openEdpuzzle(ed);
+  else if (ref) play(ref);
+  else $('msg').textContent = "That doesn't look like a YouTube or Edpuzzle link.";
 });

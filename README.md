@@ -3,6 +3,7 @@
 A small web app that plays YouTube videos inside an Onshape right-panel extension.
 
 - Paste a YouTube video/playlist link to play it.
+- Paste an Edpuzzle link to open it in a popup window (Edpuzzle blocks embedding, so it can't play inside the panel).
 
 ## Develop
 
