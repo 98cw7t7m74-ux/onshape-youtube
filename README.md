@@ -18,5 +18,9 @@ Pushing to `main` builds and publishes to GitHub Pages (enable Pages → Source:
 ## Add to Onshape
 
 1. Go to https://cad.onshape.com/appstore/dev-portal and create an application.
-2. Under Extensions, add a **Right panel** extension with the Action URL set to your Pages URL.
+2. Under Extensions, add a **Right panel** extension with the Action URL set to your Pages URL plus `?documentId={$documentId}&workspaceId={$workspaceId}&elementId={$elementId}` (lets the app remember the link per document).
 3. Add the app to your account and open it from the right-hand panel in a Part Studio / Assembly.
+
+## Remembering links
+
+The last link is saved per document in the browser's localStorage, so it is remembered on this browser only (not shared with teammates or other computers).

@@ -1,6 +1,14 @@
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
+// Onshape passes documentId/elementId in the query string; remember one link per document.
+const params = new URLSearchParams(location.search);
+const storageKey = `link:${params.get('documentId') || 'default'}:${params.get('elementId') || ''}`;
+const store = {
+  get: () => { try { return localStorage.getItem(storageKey) || ''; } catch { return ''; } },
+  set: (v) => { try { localStorage.setItem(storageKey, v); } catch { /* storage unavailable */ } },
+};
+
 // Extract a video or playlist reference from a pasted URL / bare ID.
 export function parseYouTube(input) {
   const s = input.trim();
@@ -53,7 +61,15 @@ $('form').addEventListener('submit', (e) => {
   if (!q) return;
   const ed = parseEdpuzzle(q);
   const ref = ed ? null : parseYouTube(q);
-  if (ed) openEdpuzzle(ed);
-  else if (ref) play(ref);
+  if (ed) { store.set(q); openEdpuzzle(ed); }
+  else if (ref) { store.set(q); play(ref); }
   else $('msg').textContent = "That doesn't look like a YouTube or Edpuzzle link.";
 });
+
+// Restore this document's last link. YouTube auto-loads; Edpuzzle needs a click (popups need a user gesture).
+const saved = store.get();
+if (saved) {
+  $('q').value = saved;
+  if (parseEdpuzzle(saved)) $('msg').textContent = 'Press Go to reopen your saved Edpuzzle link.';
+  else { const ref = parseYouTube(saved); if (ref) play(ref); }
+}
