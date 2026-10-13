@@ -1,11 +1,6 @@
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
-const store = {
-  get: (k) => { try { return localStorage.getItem(k) || ''; } catch { return ''; } },
-  set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage unavailable */ } },
-};
-
 // Extract a video or playlist reference from a pasted URL / bare ID.
 export function parseYouTube(input) {
   const s = input.trim();
@@ -34,47 +29,11 @@ function play({ video, list }) {
   $('msg').textContent = '';
 }
 
-async function search(q) {
-  const key = store.get('yt_api_key');
-  if (!key) {
-    $('msg').textContent = 'Paste a YouTube link, or click ⚙ and add an API key to enable search.';
-    return;
-  }
-  $('msg').textContent = 'Searching…';
-  const url = new URL('https://www.googleapis.com/youtube/v3/search');
-  url.search = new URLSearchParams({ part: 'snippet', type: 'video', maxResults: '12', videoEmbeddable: 'true', q, key });
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || res.statusText);
-    $('msg').textContent = data.items.length ? '' : 'No results.';
-    const ul = $('results');
-    ul.replaceChildren(...data.items.map((it) => {
-      const li = document.createElement('li');
-      const img = document.createElement('img');
-      img.src = it.snippet.thumbnails.default.url;
-      img.alt = '';
-      const span = document.createElement('span');
-      span.textContent = it.snippet.title;
-      li.append(img, span);
-      li.addEventListener('click', () => play({ video: it.id.videoId }));
-      return li;
-    }));
-  } catch (e) {
-    $('msg').textContent = `Search failed: ${e.message}`;
-  }
-}
-
 $('form').addEventListener('submit', (e) => {
   e.preventDefault();
   const q = $('q').value.trim();
   if (!q) return;
   const ref = parseYouTube(q);
-  if (ref) { $('results').replaceChildren(); play(ref); } else { search(q); }
-});
-$('settings-btn').addEventListener('click', () => { $('settings').hidden = !$('settings').hidden; });
-$('key').value = store.get('yt_api_key');
-$('save-key').addEventListener('click', () => {
-  store.set('yt_api_key', $('key').value.trim());
-  $('settings').hidden = true;
+  if (ref) play(ref);
+  else $('msg').textContent = "That doesn't look like a YouTube link.";
 });

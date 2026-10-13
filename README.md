@@ -3,7 +3,6 @@
 A small web app that plays YouTube videos inside an Onshape right-panel extension.
 
 - Paste a YouTube video/playlist link to play it.
-- Optional search: click ⚙ and add a YouTube Data API key (stored only in your browser).
 
 ## Develop
 
