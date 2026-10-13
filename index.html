@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube for Onshape</title>
+  </head>
+  <body>
+    <header>
+      <form id="form">
+        <input id="q" type="text" placeholder="Paste a YouTube link, or search…" autocomplete="off" />
+        <button type="submit">Go</button>
+      </form>
+      <button id="settings-btn" type="button" title="Search API key">⚙</button>
+    </header>
+    <section id="settings" hidden>
+      <label>YouTube Data API key (enables search)
+        <input id="key" type="password" placeholder="AIza…" />
+      </label>
+      <button id="save-key" type="button">Save</button>
+    </section>
+    <main>
+      <div id="player-wrap" hidden><iframe id="player" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+      <p id="msg"></p>
+      <ul id="results"></ul>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
